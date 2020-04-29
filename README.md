@@ -81,7 +81,7 @@ You should see a POST request that hast several form values as parameters, here'
 "f_export_als":"{'action':'https://api.abfallplus.de/?key=5b0384147b5bc055c30fee1fb6db6f76&modus=d6c5855a62cf32a4dadbc2831f0f295f&waction=export_ics','target':''}"
 ```
 
-`f_id_kommune` is your value for municipality
-`f_id_strasse` is your street
-`f_abfallarten` is your trash_ids value
+ - `f_id_kommune` is your value for municipality
+ - `f_id_strasse` is your street
+ - `f_abfallarten` is your trash_ids value
 
