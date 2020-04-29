@@ -1,0 +1,15 @@
+{
+  "domain": "abfallplus",
+  "name": "abfallplus",
+  "documentation": "",
+  "requirements": [
+    "recurring-ical-events",
+    "icalendar>=4.0.4",
+    "requests",
+    "pytz"
+  ],
+  "dependencies": [],
+  "codeowners": [
+    "Bouni"
+  ]
+}
