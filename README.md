@@ -6,7 +6,7 @@ AbfallPlus allows you to get upcoming municipal waste pick up dates into Home As
 
 ## Data source
 
-The data is fetched from https://api.abfallplus.de
+The data is fetched from `https://api.abfallplus.de`
 
 ### Installation:
 
@@ -49,10 +49,10 @@ The IDs seem to be the database indices and are kind of arbitrary.
 
 #### The waste management agency key
 
-Go the the website of your waste management agency, https://www.abfall-landkreis-waldshut.de/de/termine/abfuhrtage.php in my case.
+Go the the website of your waste management agency, `https://www.abfall-landkreis-waldshut.de/de/termine/abfuhrtage.php` in my case.
 Open the Developer tools of your browser select the networking tab and refresh the page.
 
-You should see at least one call to `api.abfallplus.de`, in my case https://api.abfallplus.de/index.php?key=5b0384147b5bc055c30fee1fb6db6f76
+You should see at least one call to `api.abfallplus.de`, in my case `https://api.abfallplus.de/index.php?key=5b0384147b5bc055c30fee1fb6db6f76`
 As you can see, the key is passed as an GET parameter.
 
 #### The IDs
