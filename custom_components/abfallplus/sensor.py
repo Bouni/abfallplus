@@ -28,6 +28,7 @@ DOMAIN = "abfallplus"
 
 CONF_KEY = "key"
 CONF_MUNICIPALITY_ID = "municipality"
+CONF_DISTRICT_ID = "district"
 CONF_STREET_ID = "street"
 CONF_TRASH_IDS = "trash_ids"
 CONF_NAME = "name"
@@ -47,6 +48,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Required(CONF_KEY): cv.string,
         vol.Required(CONF_MUNICIPALITY_ID): vol.Coerce(int),
+        vol.Optional(CONF_DISTRICT_ID): cv.string,
         vol.Required(CONF_STREET_ID): vol.Coerce(int),
         vol.Required(CONF_TRASH_IDS): cv.string,
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
@@ -62,6 +64,7 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     """Set up date sensor."""
     key = config.get(CONF_KEY)
     municipality = config.get(CONF_MUNICIPALITY_ID)
+    district = config.get(CONF_DISTRICT_ID)
     street = config.get(CONF_STREET_ID)
     trashtypes = config.get(CONF_TRASH_IDS)
     name = config.get(CONF_NAME)
@@ -76,6 +79,7 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
             name,
             key,
             municipality,
+            district,
             street,
             trashtypes,
             timeformat,
@@ -95,6 +99,7 @@ class AbfallPlusSensor(Entity):
         name,
         key,
         municipality,
+        district,
         street,
         trashtypes,
         timeformat,
@@ -107,6 +112,7 @@ class AbfallPlusSensor(Entity):
         self._name = name
         self._key = key
         self._municipality = municipality
+        self._district = district
         self._street = street
         self._trashtypes = trashtypes
         self._pattern = pattern
@@ -149,6 +155,8 @@ class AbfallPlusSensor(Entity):
                 "f_abfallarten": self._trashtypes,
                 "f_zeitraum": f"{dt.now().strftime('%Y%m%d')}-{(dt.now()+td(days=365)).strftime('%Y%m%d')}",
             }
+            if self._district:
+                data["f_id_bezirk"] = self._district
             modus = md5(b"scripts").hexdigest()
             _LOGGER.debug(
                 f"Request URL: https://api.abfallplus.de/?key={self._key}&modus={modus}&waction=export_ics"
