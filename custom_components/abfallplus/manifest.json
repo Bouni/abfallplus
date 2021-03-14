@@ -1,6 +1,7 @@
 {
   "domain": "abfallplus",
   "name": "abfallplus",
+  "version": "0.1.2",
   "documentation": "",
   "requirements": [
     "recurring-ical-events",
