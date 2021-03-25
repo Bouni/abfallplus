@@ -111,6 +111,7 @@ class AbfallPlusSensor(Entity):
         self._state = None
         self._name = name
         self._key = key
+        self._modus = md5(b"scripts").hexdigest()
         self._municipality = municipality
         self._district = district
         self._street = street
@@ -144,29 +145,49 @@ class AbfallPlusSensor(Entity):
         """Return the icon to use in the frontend."""
         return ICON
 
-    def get_data(self):
+    def get_hidden(self):
         try:
             headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0"
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0'
             }
+            modus = 
+            url = f"https://api.abfallplus.de/?key={self._key}&modus={self._modus}&waction=init"
+            r = requests.get(url, headers=headers)
+            kv = re.search(r'type="hidden" name="([a-f0-9]+)" value="([a-f0-9]+)"', r.text)
+            if kv:
+                return kv.group(1), kv.group(2)
+            return None, None
+        except Exception as e:
+            _LOGGER.error(f"Failed to get hidden value")
+            _LOGGER.error(e)
+            return
+
+
+    def get_data(self):
+        try:
+            hk, hv = get_hidden(key) 
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0',
+            }
+            params = (
+                ('key', self._key),
+                ('modus', self._modus),
+                ('waction', 'export_ics'),
+            )
             data = {
+                hk: hv,
                 "f_id_kommune": self._municipality,
                 "f_id_strasse": self._street,
                 "f_abfallarten": self._trashtypes,
-                "f_zeitraum": f"{dt.now().strftime('%Y%m%d')}-{(dt.now()+td(days=365)).strftime('%Y%m%d')}",
+                "f_zeitraum": f"{dt.now().strftime('%Y0101')}-{(dt.now().strftime('%Y1231')}",
             }
             if self._district:
                 data["f_id_bezirk"] = self._district
-            modus = md5(b"scripts").hexdigest()
-            _LOGGER.debug(
-                f"Request URL: https://api.abfallplus.de/?key={self._key}&modus={modus}&waction=export_ics"
-            )
+            url = 'https://api.abfallplus.de/' 
+            _LOGGER.debug(f"Request url: {url}")
+            _LOGGER.debug(f"Request parameters: {params}")
             _LOGGER.debug(f"Request data: {data}")
-            r = requests.post(
-                f"https://api.abfallplus.de/?key={self._key}&modus={modus}&waction=export_ics",
-                data=data,
-                headers=headers,
-            )
+            r = requests.post(url, headers=headers, params=params, data=data)
         except:
             _LOGGER.error(f"Couldn't get ical from url")
             return
