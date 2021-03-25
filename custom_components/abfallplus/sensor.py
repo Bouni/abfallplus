@@ -146,51 +146,52 @@ class AbfallPlusSensor(Entity):
         return ICON
 
     def get_hidden(self):
+        _LOGGER.debug(f"try to get hidden values using {self._key} as key")
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0'
+        }
+        url = f"https://api.abfallplus.de/?key={self._key}&modus={self._modus}&waction=init"
+        _LOGGER.debug(f"get_hidden request URL {url}")
         try:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0'
-            }
-            modus = 
-            url = f"https://api.abfallplus.de/?key={self._key}&modus={self._modus}&waction=init"
             r = requests.get(url, headers=headers)
-            kv = re.search(r'type="hidden" name="([a-f0-9]+)" value="([a-f0-9]+)"', r.text)
-            if kv:
-                return kv.group(1), kv.group(2)
-            return None, None
         except Exception as e:
             _LOGGER.error(f"Failed to get hidden value")
             _LOGGER.error(e)
             return
+        kv = re.search(r'type="hidden" name="([a-f0-9]+)" value="([a-f0-9]+)"', r.text)
+        if kv:
+            _LOGGER.debug(f"get_hidden was successful")
+            return kv.group(1), kv.group(2)
+        _LOGGER.error(f"get_hidden was not successful")
+        return None, None
 
 
     def get_data(self):
+        hk, hv = self.get_hidden() 
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0',
+        }
+        data = {
+            hk: hv,
+            "f_id_kommune": self._municipality,
+            "f_id_strasse": self._street,
+            "f_abfallarten": self._trashtypes,
+            "f_zeitraum": f"{dt.now().strftime('%Y0101')}-{dt.now().strftime('%Y1231')}",
+        }
+        if self._district:
+            data["f_id_bezirk"] = self._district
+        url = f"https://api.abfallplus.de/?key={self._key}&modus={self._modus}&waction=export_ics"
+        _LOGGER.debug(f"get_ical headers: {headers}")
+        _LOGGER.debug(f"get_ical data: {data}")
+        _LOGGER.debug(f"get_ical URL: {url}")
         try:
-            hk, hv = get_hidden(key) 
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0',
-            }
-            params = (
-                ('key', self._key),
-                ('modus', self._modus),
-                ('waction', 'export_ics'),
-            )
-            data = {
-                hk: hv,
-                "f_id_kommune": self._municipality,
-                "f_id_strasse": self._street,
-                "f_abfallarten": self._trashtypes,
-                "f_zeitraum": f"{dt.now().strftime('%Y0101')}-{(dt.now().strftime('%Y1231')}",
-            }
-            if self._district:
-                data["f_id_bezirk"] = self._district
-            url = 'https://api.abfallplus.de/' 
-            _LOGGER.debug(f"Request url: {url}")
-            _LOGGER.debug(f"Request parameters: {params}")
-            _LOGGER.debug(f"Request data: {data}")
-            r = requests.post(url, headers=headers, params=params, data=data)
-        except:
+            r = requests.post(url, headers=headers, data=data)
+        except Exception as e:
             _LOGGER.error(f"Couldn't get ical from url")
+            _LOGGER.error(e)
             return
+
+        _LOGGER.debug(f"get_ical was successful")
 
         try:
             cal = Calendar.from_ical(r.content)
