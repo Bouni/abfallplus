@@ -2,7 +2,7 @@
   "domain": "abfallplus",
   "name": "abfallplus",
   "version": "0.1.3",
-  "documentation": "",
+  "documentation": "https://github.com/Bouni/abfallplus",
   "requirements": [
     "recurring-ical-events",
     "icalendar>=4.0.4",
@@ -11,6 +11,6 @@
   ],
   "dependencies": [],
   "codeowners": [
-    "Bouni"
+    "@bouni"
   ]
 }
