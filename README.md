@@ -1,5 +1,7 @@
 # AbfallPlus
 
+[![Validate with hassfest](https://github.com/Bouni/abfallplus/actions/workflows/hassfest.yml/badge.svg)](https://github.com/Bouni/abfallplus/actions/workflows/hassfest.yml)
+
 This component has been created to be used with Home Assistant.
 
 AbfallPlus allows you to get upcoming municipal waste pick up dates into Home Assistant.
