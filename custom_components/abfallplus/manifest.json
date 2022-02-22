@@ -6,10 +6,10 @@
   "issue_tracker": "https://github.com/Bouni/abfallplus/issues",
   "documentation": "https://github.com/Bouni/abfallplus",
   "requirements": [
-    "recurring-ical-events",
+    "recurring-ical-events>=1.0.1b0",
     "icalendar>=4.0.4",
-    "requests",
-    "pytz"
+    "requests>=2.27.1",
+    "pytz>=2021.3"
   ],
   "dependencies": [],
   "codeowners": [
