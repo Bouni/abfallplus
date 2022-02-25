@@ -47,6 +47,10 @@ The data is fetched from `https://api.abfallplus.de`
  - `trash_ids` is required, the IDs of the trash IDs you want to receive (see details below)
  - `pattern` is optional, filter waste types depending on this keyword 
 
+This gives you a `sensor` in Home-Assiatnt that's called `sensor.bio_tonne` which has the next collection date as it's state:
+
+![image](https://user-images.githubusercontent.com/948965/155665244-52ab32bd-c6a8-45ab-b1fd-cd4ad402bd46.png)
+
 ### How to get all the IDs
 
 Here we come to the Problem of this Integration. AbfallPlus does not have a open documented API but we use the API calls that are made by the waste management agency.
