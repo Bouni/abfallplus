@@ -14,6 +14,6 @@ jobs:
     steps:
       - uses: "actions/checkout@v2"
       - name: HACS Action
-        uses: "bouni/action@main"
+        uses: "hacs/action@main"
         with:
           category: "integration"
