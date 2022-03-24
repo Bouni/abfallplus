@@ -8,11 +8,9 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 from hashlib import md5
 
-import pytz
 import recurring_ical_events
-import requests
-from icalendar import Calendar, Event
-
+from icalendar import Calendar
+import aiohttp
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.sensor import ENTITY_ID_FORMAT, PLATFORM_SCHEMA
@@ -145,65 +143,17 @@ class AbfallPlusSensor(Entity):
         """Return the icon to use in the frontend."""
         return ICON
 
-    def get_hidden(self):
-        _LOGGER.debug(f"try to get hidden values using {self._key} as key")
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0'
-        }
-        url = f"https://api.abfallplus.de/?key={self._key}&modus={self._modus}&waction=init"
-        _LOGGER.debug(f"get_hidden request URL {url}")
+    def parse_ics_data(self, ics):
+        """Parse the AbfallPlus ICS data"""
         try:
-            r = requests.get(url, headers=headers)
-        except Exception as e:
-            _LOGGER.error(f"Failed to get hidden value")
-            _LOGGER.error(e)
-            return
-        kv = re.search(r'type="hidden" name="([a-f0-9]+)" value="([a-f0-9]+)"', r.text)
-        if kv:
-            _LOGGER.debug(f"get_hidden was successful")
-            return kv.group(1), kv.group(2)
-        _LOGGER.error(f"get_hidden was not successful")
-        return None, None
-
-
-    def get_data(self):
-        hk, hv = self.get_hidden() 
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0',
-        }
-        data = {
-            hk: hv,
-            "f_id_kommune": self._municipality,
-            "f_id_strasse": self._street,
-            "f_abfallarten": self._trashtypes,
-            "f_zeitraum": f"{dt.now().strftime('%Y0101')}-{dt.now().strftime('%Y1231')}",
-        }
-        if self._district:
-            data["f_id_bezirk"] = self._district
-        url = f"https://api.abfallplus.de/?key={self._key}&modus={self._modus}&waction=export_ics"
-        _LOGGER.debug(f"get_ical headers: {headers}")
-        _LOGGER.debug(f"get_ical data: {data}")
-        _LOGGER.debug(f"get_ical URL: {url}")
-        try:
-            r = requests.post(url, headers=headers, data=data)
-        except Exception as e:
-            _LOGGER.error(f"Couldn't get ical from url")
-            _LOGGER.error(e)
-            return
-
-        _LOGGER.debug(f"get_ical was successful")
-
-        try:
-            cal = Calendar.from_ical(r.content)
+            cal = Calendar.from_ical(ics)
             reoccuring_events = recurring_ical_events.of(cal).between(
                 dt.now(), dt.now() + td(self._lookahead)
             )
         except Exception as e:
             _LOGGER.error(f"Couldn't parse ical file, {e}")
             return
-
         self._state = "unknown"
-
         for event in reoccuring_events:
             if event.has_key("SUMMARY"):
                 if re.match(self._pattern, event.get("SUMMARY")):
@@ -214,7 +164,42 @@ class AbfallPlusSensor(Entity):
                     self._state_attributes["description"] = event.get("DESCRIPTION", "")
                     break
 
+    async def get_data(self):
+        """Fetch ICS data from AbfallPlus"""
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0",
+        }
+        base_url = f"https://api.abfallplus.de/?key={self._key}&modus={self._modus}"
+        async with aiohttp.ClientSession(headers=headers) as session:
+            url = f"{base_url}&waction=init"
+            try:
+                async with session.get(url) as r:
+                    data = await r.text()
+                    res = re.search(
+                        r'type="hidden" name="([a-f0-9]+)" value="([a-f0-9]+)"', data
+                    )
+                    if not res:
+                        _LOGGER.error(f"Failed to get hidden key value pair")
+                        return
+            except Exception as e:
+                _LOGGER.error(f"Failed to fetch hidden key value resource")
+                return
+            data = {
+                res.group(1): res.group(2),
+                "f_id_kommune": self._municipality,
+                "f_id_strasse": self._street,
+                "f_abfallarten": self._trashtypes,
+                "f_zeitraum": f"{dt.now().strftime('%Y0101')}-{dt.now().strftime('%Y1231')}",
+            }
+            url = f"{base_url}&waction=export_ics"
+            try:
+                async with session.post(url, data=data) as r:
+                    self.parse_ics_data(await r.text())
+            except Exception as e:
+                _LOGGER.error(f"Failed to fetch ICS resource")
+                return
+
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
-    def update(self):
+    async def async_update(self):
         """Fetch new state data for the sensor from the ics file url."""
-        self.get_data()
+        await self.get_data()
