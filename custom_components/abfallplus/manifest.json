@@ -7,7 +7,7 @@
   "documentation": "https://github.com/Bouni/abfallplus",
   "requirements": [
     "recurring-ical-events>=1.0.1b0",
-    "icalendar>=4.0.4",
+    "icalendar>=4.0.4"
   ],
   "dependencies": [],
   "codeowners": [
