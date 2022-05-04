@@ -95,3 +95,12 @@ You should see a POST request that hast several form values as parameters, here'
  - `f_id_strasse` is your street
  - `f_abfallarten` is your trash_ids value
 
+❗ In some cases you'll get something like this where `f_id_strasse` is not a number:
+
+```
+"f_id_kommune": "2593",
+"f_id_bezirk": "492,493",
+"f_id_strasse": "2593bauernschaften",
+"f_id_strasse_hnr": "496"
+```
+In that case you can use `f_id_strasse_hnr` for the `street` config value!
