@@ -5,6 +5,7 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/Bouni/abfallplus/issues",
   "documentation": "https://github.com/Bouni/abfallplus",
+  "config_flow": true,
   "requirements": [
     "recurring-ical-events>=1.0.1b0",
     "icalendar>=4.0.4"

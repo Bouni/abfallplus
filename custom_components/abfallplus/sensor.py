@@ -18,26 +18,25 @@ from homeassistant.const import CONF_NAME
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.util import Throttle
+from .const import (
+    CONF_KEY,
+    CONF_MUNICIPALITY_ID,
+    CONF_DISTRICT_ID,
+    CONF_STREET_ID,
+    CONF_TRASH_IDS,
+    CONF_NAME,
+    CONF_PATTERN,
+    CONF_TIMEFORMAT,
+    CONF_LOOKAHEAD,
+    ICON,
+    DEFAULT_NAME,
+    DEFAULT_PATTERN,
+    DEFAULT_LOOKAHEAD,
+    DEFAULT_TIMEFORMAT,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
-
-ICON = "mdi:calendar"
-DOMAIN = "abfallplus"
-
-CONF_KEY = "key"
-CONF_MUNICIPALITY_ID = "municipality"
-CONF_DISTRICT_ID = "district"
-CONF_STREET_ID = "street"
-CONF_TRASH_IDS = "trash_ids"
-CONF_NAME = "name"
-CONF_TIMEFORMAT = "timeformat"
-CONF_LOOKAHEAD = "lookahead"
-CONF_PATTERN = "pattern"
-
-DEFAULT_NAME = "abfallplus"
-DEFAULT_PATTERN = ""
-DEFAULT_TIMEFORMAT = "%A, %d.%m.%Y"
-DEFAULT_LOOKAHEAD = 365
 
 MIN_TIME_BETWEEN_UPDATES = td(seconds=1800)
 
@@ -55,7 +54,6 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_LOOKAHEAD, default=DEFAULT_LOOKAHEAD): vol.Coerce(int),
     }
 )
-
 
 @asyncio.coroutine
 def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
