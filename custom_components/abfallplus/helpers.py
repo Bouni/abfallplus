@@ -34,6 +34,11 @@ async def get_cities(api_key: str) -> dict | None:
                  cities[match[0]] = match[1]
             return cities
 
+async def get_district() -> dict | None:
+    pass
+
+async def get_streets() -> dict | None: 
+    pass
 
 #  s = requests.Session()
 #  s.headers.update(
