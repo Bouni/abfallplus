@@ -3,7 +3,13 @@ import logging
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from .const import DOMAIN
-from .scraper import get_api_key, get_cities, get_districts, get_streets, get_trash_types
+from .scraper import (
+    get_api_key,
+    get_cities,
+    get_districts,
+    get_streets,
+    get_trash_types,
+)
 
 _LOGGER = logging.getLogger(__name__)
 # https://github.com/home-assistant/example-custom-config/tree/master/custom_components/detailed_hello_world_push
@@ -62,7 +68,13 @@ class AbfallPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 _LOGGER.error(e)
         return self.async_show_form(
             step_id="district",
-            data_schema=vol.Schema({vol.Required("DISTRICT", default=list(self.districts.keys())[0]): vol.In(self.districts)}),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        "DISTRICT", default=list(self.districts.keys())[0]
+                    ): vol.In(self.districts)
+                }
+            ),
         )
 
     async def async_step_street(self, user_input=None):
@@ -87,13 +99,20 @@ class AbfallPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="street",
-            data_schema=vol.Schema({vol.Required("STREET", default=list(self.streets.keys())[0]): vol.In(self.streets)}),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        "STREET", default=list(self.streets.keys())[0]
+                    ): vol.In(self.streets)
+                }
+            ),
         )
 
     async def async_step_trash_type(self, user_input=None):
-        _LOGGER.warning("Step trash type") 
         if user_input is not None:
-            self.trash_type = user_input["TRASH_TYPE"]
+            # create sensors here
+            pass
+            # self.trash_type = user_input["TRASH_TYPE"]
         else:
             self.trash_types = {}
             try:
@@ -105,13 +124,19 @@ class AbfallPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self.hidden_name,
                     self.hidden_value,
                 )
-                _LOGGER.error(self.trash_types)
-                
+
+                data_schema = {}
+
             except Exception as e:
                 _LOGGER.error(e)
 
         return self.async_show_form(
             step_id="trash_type",
-            data_schema=vol.Schema({vol.Required("TRASH_TYPE", default=list(self.trash_types.keys())): cv.multi_select(self.trash_types)})
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        "TRASH_TYPE", default=list(self.trash_types.keys())
+                    ): cv.multi_select(self.trash_types)
+                }
+            ),
         )
-
