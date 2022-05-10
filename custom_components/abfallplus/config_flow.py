@@ -5,8 +5,13 @@ import voluptuous as vol
 from homeassistant import config_entries
 
 from .const import DOMAIN
-from .scraper import (get_api_key, get_cities, get_districts, get_streets,
-                      get_trash_types)
+from .scraper import (
+    get_api_key,
+    get_cities,
+    get_districts,
+    get_streets,
+    get_trash_types,
+)
 
 _LOGGER = logging.getLogger(__name__)
 # https://github.com/home-assistant/example-custom-config/tree/master/custom_components/detailed_hello_world_push
@@ -107,9 +112,8 @@ class AbfallPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_trash_type(self, user_input=None):
         if user_input is not None:
-            # create sensors here
-            pass
-            # self.trash_type = user_input["TRASH_TYPE"]
+            self.trash_type = user_input["TRASH_TYPE"]
+            return await self.async_step_details()
         else:
             self.trash_types = {}
             try:
@@ -121,9 +125,6 @@ class AbfallPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self.hidden_name,
                     self.hidden_value,
                 )
-
-                data_schema = {}
-
             except Exception as e:
                 _LOGGER.error(e)
 
@@ -137,3 +138,27 @@ class AbfallPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
             ),
         )
+
+    # https://developers.home-assistant.io/docs/data_entry_flow_index/
+
+    async def async_step_details(self, user_input=None):
+        data_schema = {}
+        if user_input is not None:
+            pass
+            # create entries
+        else:
+            for trash_type in self.trash_type:
+                data_schema[
+                    vol.Required(
+                        f"{trash_type}_name", default=self.trash_types[trash_type]
+                    )
+                ] = str
+                data_schema[vol.Required(f"{trash_type}_lookahead", default=14)] = int
+                data_schema[
+                    vol.Required(f"{trash_type}_dateformat", default="%d.%m.%Y")
+                ] = str
+        return self.async_show_form(
+            step_id="details",
+            data_schema=vol.Schema(data_schema),
+        )
+
