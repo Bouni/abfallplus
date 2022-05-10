@@ -4,7 +4,7 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant import config_entries
 
-from .const import DOMAIN
+from .const import DOMAIN, DEFAULT_LOOKAHEAD, DEFAULT_TIMEFORMAT
 from .scraper import (
     get_api_key,
     get_cities,
@@ -144,21 +144,27 @@ class AbfallPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_details(self, user_input=None):
         data_schema = {}
         if user_input is not None:
-            pass
-            # create entries
-        else:
+            data = []
             for trash_type in self.trash_type:
-                data_schema[
-                    vol.Required(
-                        f"{trash_type}_name", default=self.trash_types[trash_type]
-                    )
-                ] = str
-                data_schema[vol.Required(f"{trash_type}_lookahead", default=14)] = int
-                data_schema[
-                    vol.Required(f"{trash_type}_dateformat", default="%d.%m.%Y")
-                ] = str
+                data.append({
+                    "trash_id": trash_type,
+                    "trash_name": self.trash_types[trash_type],
+                    "city": self.city,
+                    "district": self.district,
+                    "street": self.street,
+                    "lookahead": user_input["LOOKAHEAD"],
+                    "timeformat": user_input["TIMEFORMAT"]
+                })
+                _LOGGER.error(data)
+            return self.async_create_entry(title="AbfallPlus", data=data)
+        else:
+            data_schema = {
+                    vol.Required("LOOKAHEAD", default=DEFAULT_LOOKAHEAD): int,
+                    vol.Required("TIMEFORMAT", default=DEFAULT_TIMEFORMAT): str
+                    }
         return self.async_show_form(
             step_id="details",
             data_schema=vol.Schema(data_schema),
         )
+
 

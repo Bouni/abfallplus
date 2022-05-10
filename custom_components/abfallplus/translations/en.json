@@ -19,6 +19,13 @@
       },
       "trash_type": {
         "title": "Select your trashtypes"
+      },
+      "details": {
+        "title": "Choose lookahead and date format",
+        "data": {
+            "LOOKAHEAD": "Days to look ahead",
+            "TIMEFORMAT": "Time format for the dates"
+        }
       }
     }
   }
