@@ -1,15 +1,12 @@
-from homeassistant import config_entries
 import logging
+
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+from homeassistant import config_entries
+
 from .const import DOMAIN
-from .scraper import (
-    get_api_key,
-    get_cities,
-    get_districts,
-    get_streets,
-    get_trash_types,
-)
+from .scraper import (get_api_key, get_cities, get_districts, get_streets,
+                      get_trash_types)
 
 _LOGGER = logging.getLogger(__name__)
 # https://github.com/home-assistant/example-custom-config/tree/master/custom_components/detailed_hello_world_push

@@ -8,33 +8,22 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 from hashlib import md5
 
-import recurring_ical_events
-from icalendar import Calendar
 import aiohttp
 import homeassistant.helpers.config_validation as cv
+import recurring_ical_events
 import voluptuous as vol
 from homeassistant.components.sensor import ENTITY_ID_FORMAT, PLATFORM_SCHEMA
 from homeassistant.const import CONF_NAME
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.util import Throttle
-from .const import (
-    CONF_KEY,
-    CONF_MUNICIPALITY_ID,
-    CONF_DISTRICT_ID,
-    CONF_STREET_ID,
-    CONF_TRASH_IDS,
-    CONF_NAME,
-    CONF_PATTERN,
-    CONF_TIMEFORMAT,
-    CONF_LOOKAHEAD,
-    ICON,
-    DEFAULT_NAME,
-    DEFAULT_PATTERN,
-    DEFAULT_LOOKAHEAD,
-    DEFAULT_TIMEFORMAT,
-    DOMAIN,
-)
+from icalendar import Calendar
+
+from .const import (CONF_DISTRICT_ID, CONF_KEY, CONF_LOOKAHEAD,
+                    CONF_MUNICIPALITY_ID, CONF_NAME, CONF_PATTERN,
+                    CONF_STREET_ID, CONF_TIMEFORMAT, CONF_TRASH_IDS,
+                    DEFAULT_LOOKAHEAD, DEFAULT_NAME, DEFAULT_PATTERN,
+                    DEFAULT_TIMEFORMAT, DOMAIN, ICON)
 
 _LOGGER = logging.getLogger(__name__)
 

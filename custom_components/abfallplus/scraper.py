@@ -1,7 +1,9 @@
 from __future__ import annotations
+
+import logging
 import re
 from hashlib import md5
-import logging
+
 import aiohttp
 
 _LOGGER = logging.getLogger(__name__)
