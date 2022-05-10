@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "The URL of your municipality waste management website.",
+        "title": "Website URL",
+        "data": {
+            "URL": "e.g. https://www.abfall-landkreis-waldshut.de/de/termine/"
+        }
+      },
+      "city": {
+        "title": "Select your city"
+      },
+      "district": {
+        "title": "Select your district"
+      },
+      "street": {
+        "title": "Select your street"
+      },
+      "trash_type": {
+        "title": "Select your trashtypes"
+      }
+    }
+  }
+}
