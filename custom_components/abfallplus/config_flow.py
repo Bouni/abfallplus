@@ -4,7 +4,7 @@ import logging
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from .const import DOMAIN
-from .helpers import get_api_key, get_cities
+from .scraper import get_api_key, get_cities
 
 _LOGGER = logging.getLogger(__name__)
 
