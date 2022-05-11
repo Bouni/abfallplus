@@ -7,8 +7,10 @@ from datetime import date
 from datetime import datetime as dt
 from datetime import timedelta as td
 from hashlib import md5
+from typing import Any, Callable, Dict, Optional
 
 import aiohttp
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 import recurring_ical_events
 import voluptuous as vol
@@ -17,13 +19,31 @@ from homeassistant.const import CONF_NAME
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.util import Throttle
+from homeassistant import config_entries, core
+from homeassistant.helpers.typing import (
+    ConfigType,
+    DiscoveryInfoType,
+    HomeAssistantType,
+)
 from icalendar import Calendar
 
-from .const import (CONF_DISTRICT_ID, CONF_KEY, CONF_LOOKAHEAD,
-                    CONF_MUNICIPALITY_ID, CONF_NAME, CONF_PATTERN,
-                    CONF_STREET_ID, CONF_TIMEFORMAT, CONF_TRASH_IDS,
-                    DEFAULT_LOOKAHEAD, DEFAULT_NAME, DEFAULT_PATTERN,
-                    DEFAULT_TIMEFORMAT, DOMAIN, ICON)
+from .const import (
+    CONF_DISTRICT_ID,
+    CONF_KEY,
+    CONF_LOOKAHEAD,
+    CONF_MUNICIPALITY_ID,
+    CONF_NAME,
+    CONF_PATTERN,
+    CONF_STREET_ID,
+    CONF_TIMEFORMAT,
+    CONF_TRASH_IDS,
+    DEFAULT_LOOKAHEAD,
+    DEFAULT_NAME,
+    DEFAULT_PATTERN,
+    DEFAULT_TIMEFORMAT,
+    DOMAIN,
+    ICON,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,35 +65,80 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 )
 
 
-@asyncio.coroutine
-def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
-    """Set up date sensor."""
-    key = config.get(CONF_KEY)
-    municipality = config.get(CONF_MUNICIPALITY_ID)
-    district = config.get(CONF_DISTRICT_ID)
-    street = config.get(CONF_STREET_ID)
-    trashtypes = config.get(CONF_TRASH_IDS)
-    name = config.get(CONF_NAME)
-    pattern = config.get(CONF_PATTERN)
-    timeformat = config.get(CONF_TIMEFORMAT)
-    lookahead = config.get(CONF_LOOKAHEAD)
+# @asyncio.coroutine
+# def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
+#    """Set up date sensor."""
+#    key = config.get(CONF_KEY)
+#    municipality = config.get(CONF_MUNICIPALITY_ID)
+#    district = config.get(CONF_DISTRICT_ID)
+#    street = config.get(CONF_STREET_ID)
+#    trashtypes = config.get(CONF_TRASH_IDS)
+#    name = config.get(CONF_NAME)
+#    pattern = config.get(CONF_PATTERN)
+#    timeformat = config.get(CONF_TIMEFORMAT)
+#    lookahead = config.get(CONF_LOOKAHEAD)
+#
+#    devices = []
+#    devices.append(
+#        AbfallPlusSensor(
+#            hass,
+#            name,
+#            key,
+#            municipality,
+#            district,
+#            street,
+#            trashtypes,
+#            timeformat,
+#            lookahead,
+#            pattern,
+#        )
+#    )
+#    async_add_devices(devices)
 
-    devices = []
-    devices.append(
-        AbfallPlusSensor(
-            hass,
-            name,
-            key,
-            municipality,
-            district,
-            street,
-            trashtypes,
-            timeformat,
-            lookahead,
-            pattern,
+
+async def async_setup_entry(
+    hass: core.HomeAssistant,
+    config_entry: config_entries.ConfigEntry,
+    async_add_entities,
+):
+    """Setup sensors from a config entry created in the integrations UI."""
+    config = hass.data[DOMAIN][config_entry.entry_id]
+    # session = async_get_clientsession(hass)
+    # github = GitHubAPI(session, "requester", oauth_token=config[CONF_ACCESS_TOKEN])
+    # sensors = [GitHubRepoSensor(github, repo) for repo in config[CONF_REPOS]]
+    sensors = []
+    #  async_add_entities(sensors, update_before_add=True)
+    for cfg in config[DOMAIN]:
+        sensors.append(AbfallPlusSensor(
+            hass=hass,
+            name=cfg.get("trash_name"),
+            key=cfg.get("api_key"),
+            municipality=cfg.get("city_id"),
+            district=cfg.get("district_id"),
+            street=cfg.get("street_id"),
+            trashtypes=cfg.get("trash_id"),
+            timeformat=cfg.get("timeformat"),
+            lookahead=cfg.get("lookahead"),
+            pattern=cfg.get("trash_name"),
+            )
         )
-    )
-    async_add_devices(devices)
+    async_add_entities(sensors, update_before_add=True)
+    #{'trash_id': '51', 'trash_name': 'Blaue Tonne', 'city_id': '250', 'city_name': 'Albbruck', 'district_id': '15701', 'district_name': 'alle Straßen', 'street_id': '15701', 'street_name': 'alle Straßen', 'lookahead': 365, 'timeformat': '%A, %d.%m.%Y'}
+
+async def async_setup_platform(
+    hass: HomeAssistantType,
+    config: ConfigType,
+    async_add_entities: Callable,
+    discovery_info: Optional[DiscoveryInfoType] = None,
+) -> None:
+    """Set up the sensor platform."""
+    _LOGGER.error("async_setup_platform")
+    _LOGGER.error(config)
+    # session = async_get_clientsession(hass)
+    # github = GitHubAPI(session, "requester", oauth_token=config[CONF_ACCESS_TOKEN])
+    # sensors = [GitHubRepoSensor(github, repo) for repo in config[CONF_REPOS]]
+    #  sensors = []
+    #  async_add_entities(sensors, update_before_add=True)
 
 
 class AbfallPlusSensor(Entity):

@@ -144,19 +144,22 @@ class AbfallPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_details(self, user_input=None):
         data_schema = {}
         if user_input is not None:
-            data = []
+            data = {DOMAIN:[]}
             for trash_type in self.trash_type:
-                data.append({
+                data[DOMAIN].append({
+                    "api_key": self.api_key,
                     "trash_id": trash_type,
                     "trash_name": self.trash_types[trash_type],
-                    "city": self.city,
-                    "district": self.district,
-                    "street": self.street,
+                    "city_id": self.city,
+                    "city_name": self.cities[self.city],
+                    "district_id": self.district,
+                    "district_name": self.districts[self.district],
+                    "street_id": self.street,
+                    "street_name": self.streets[self.street],
                     "lookahead": user_input["LOOKAHEAD"],
                     "timeformat": user_input["TIMEFORMAT"]
                 })
-                _LOGGER.error(data)
-            return self.async_create_entry(title="AbfallPlus", data=data)
+            return self.async_create_entry(title=f"AbfallPlus {self.cities[self.city]} {self.streets[self.street]}", data=data)
         else:
             data_schema = {
                     vol.Required("LOOKAHEAD", default=DEFAULT_LOOKAHEAD): int,
