@@ -5,7 +5,7 @@ Here I document my findings about the API during my reverse engineering efforts.
 # https://www.abfallplus.de/fuer-buerger/
 
 ```
-- f_wkey: fc6451bcaedf0696047ff9e78b48309d
+- f_wkey: changes for every request, can be scraped of https://www.abfallplus.de/fuer-buerger/
 - fapi: 3e8fbf4dd972b642839dee3d5eb1c8bc
 
 
