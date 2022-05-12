@@ -28,7 +28,7 @@ Here I document my findings about the API during my reverse engineering efforts.
 ```
 
 ```sh
-# List of 
+# Get all municipalities for a certain Bundesland, Baden-Würtemberg in this example
 curl -X POST \
      -F f_wkey=fc6451bcaedf0696047ff9e78b48309d \
      -F f_id_bundesland=c4ca4238a0b923820dcc509a6f75849b \
