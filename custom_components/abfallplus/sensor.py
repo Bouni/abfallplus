@@ -7,7 +7,7 @@ from datetime import date
 from datetime import datetime as dt
 from datetime import timedelta as td
 from hashlib import md5
-from sys import getsizeof
+
 
 import recurring_ical_events
 from icalendar import Calendar
@@ -167,23 +167,15 @@ class AbfallPlusSensor(Entity):
 
     async def get_data(self):
         """Fetch ICS data from AbfallPlus"""
-        data = {
-            "key": self._key,
-            "modus": self._modus,
-            "waction": "init"
-        }
-
         headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0",
-            "Content-Length": str(getsizeof(data)),
-            "Host": "api.abfall.io",
-            "Content-type": "application/x-www-form-urlencoded"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36",
+            "Host": "api.abfall.io"
         }
         base_url = f"https://api.abfall.io/?key={self._key}&modus={self._modus}"
         async with aiohttp.ClientSession(headers=headers) as session:
             url = f"{base_url}&waction=init"
             try:
-                async with session.get(url) as r:
+                async with session.post(url) as r:
                     data = await r.text()
                     res = re.search(
                         r'type="hidden" name="([a-f0-9]+)" value="([a-f0-9]+)"', data
@@ -201,7 +193,7 @@ class AbfallPlusSensor(Entity):
                 "f_abfallarten": self._trashtypes,
                 "f_zeitraum": f"{dt.now().strftime('%Y0101')}-{dt.now().strftime('%Y1231')}",
             }
-            headers["Content-Length"] = str(getsizeof(data))
+            headers["Content-Type"] = "application/x-www-form-urlencoded"
 
             url = f"{base_url}&waction=export_ics"
             try:
