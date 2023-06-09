@@ -1,7 +1,7 @@
 {
   "domain": "abfallplus",
   "name": "abfallplus",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/Bouni/abfallplus/issues",
   "documentation": "https://github.com/Bouni/abfallplus",
