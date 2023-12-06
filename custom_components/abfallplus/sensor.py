@@ -1,6 +1,5 @@
 """ Abfallplus municipal waste sensor."""
 
-import asyncio
 import logging
 import re
 from datetime import date
@@ -162,13 +161,14 @@ class AbfallPlusSensor(Entity):
                         event["DTSTART"].dt - date.today()
                     ).days
                     self._state_attributes["description"] = event.get("DESCRIPTION", "")
-                    break
+                    return True
+        return False
 
     async def get_data(self):
         """Fetch ICS data from AbfallPlus"""
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36",
-            "Host": "api.abfall.io"
+            "Host": "api.abfall.io",
         }
         base_url = f"https://api.abfall.io/?key={self._key}&modus={self._modus}"
         async with aiohttp.ClientSession(headers=headers) as session:
@@ -180,10 +180,10 @@ class AbfallPlusSensor(Entity):
                         r'type="hidden" name="([a-f0-9]+)" value="([a-f0-9]+)"', data
                     )
                     if not res:
-                        _LOGGER.error(f"Failed to get hidden key value pair")
+                        _LOGGER.error("Failed to get hidden key value pair")
                         return
-            except Exception as e:
-                _LOGGER.error(f"Failed to fetch hidden key value resource")
+            except Exception:
+                _LOGGER.error("Failed to fetch hidden key value resource")
                 return
             data = {
                 res.group(1): res.group(2),
@@ -195,12 +195,45 @@ class AbfallPlusSensor(Entity):
             headers["Content-Type"] = "application/x-www-form-urlencoded"
 
             url = f"{base_url}&waction=export_ics"
+            result = False
             try:
                 async with session.post(url, data=data, headers=headers) as r:
-                    self.parse_ics_data(await r.text())
-            except Exception as e:
-                _LOGGER.error(f"Failed to fetch ICS resource")
+                    result = self.parse_ics_data(await r.text())
+            except Exception:
+                _LOGGER.error("Failed to fetch ICS resource for this year")
                 return
+
+            if result:
+                _LOGGER.debug(
+                    "Found match for %s in ICS data for this year", self._pattern
+                )
+                return
+
+            _LOGGER.debug(
+                "Didn't find a match for %s in ICS data for this year, try next year",
+                self._pattern,
+            )
+
+            next = dt.now() + td(days=365)
+
+            data["f_zeitraum"] = f"{next.strftime('%Y0101')}-{next.strftime('%Y1231')}"
+            try:
+                async with session.post(url, data=data) as r:
+                    ics = await r.text()
+                    result = self.parse_ics_data(ics)
+            except Exception:
+                _LOGGER.error("Failed to fetch ICS resource for next year")
+                return
+
+            if result:
+                _LOGGER.debug(
+                    "Found match for %s in ICS data for next year", self._pattern
+                )
+                return
+
+            _LOGGER.debug(
+                "Didn't find a match for %s in ICS data for next year", self._pattern
+            )
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
