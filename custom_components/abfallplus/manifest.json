@@ -1,11 +1,11 @@
 {
+  "codeowners": ["@bouni"]
+  "dependencies": [],
+  "documentation": "https://github.com/Bouni/abfallplus",
   "domain": "abfallplus",
-  "name": "abfallplus",
-  "version": "0.3.0",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/Bouni/abfallplus/issues",
-  "documentation": "https://github.com/Bouni/abfallplus",
+  "name": "abfallplus",
   "requirements": ["recurring-ical-events>=2.1.1", "icalendar>=5.0.11"],
-  "dependencies": [],
-  "codeowners": ["@bouni"]
+  "version": "0.3.0",
 }
