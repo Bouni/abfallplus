@@ -16,7 +16,7 @@ import voluptuous as vol
 from homeassistant.components.sensor import ENTITY_ID_FORMAT, PLATFORM_SCHEMA
 from homeassistant.const import CONF_NAME
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.core import HomeAssistant
 from homeassistant.util import Throttle
 
 _LOGGER = logging.getLogger(__name__)
@@ -92,7 +92,7 @@ class AbfallPlusSensor(Entity):
 
     def __init__(
         self,
-        hass: HomeAssistantType,
+        hass: HomeAssistant,
         name,
         key,
         municipality,
