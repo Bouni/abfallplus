@@ -1,5 +1,14 @@
 # AbfallPlus
 
+----
+
+> [!WARNING]  
+> This integration is no longer maintained!
+> 
+> I highly recommentd to use [Waste Collection Schedule](https://github.com/mampfes/hacs_waste_collection_schedule) in combination with [TrashCard](https://github.com/idaho/hassio-trash-card).
+
+----
+
 [![Validate with hassfest](https://github.com/Bouni/abfallplus/actions/workflows/hassfest.yml/badge.svg)](https://github.com/Bouni/abfallplus/actions/workflows/hassfest.yml)
 [![Validate with HACS Action](https://github.com/Bouni/abfallplus/actions/workflows/hacs.yml/badge.svg)](https://github.com/Bouni/abfallplus/actions/workflows/hacs.yml)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
